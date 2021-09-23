@@ -1,0 +1,3 @@
+[submodule "cs444/lab1/jos"]
+	path = cs444/lab1/jos
+	url = git@gitlab.unexploitable.systems:detjensrobert/jos.git
