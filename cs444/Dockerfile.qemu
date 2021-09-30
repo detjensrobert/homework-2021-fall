@@ -1,0 +1,18 @@
+FROM centos:7
+
+# install dependencies
+RUN yum -y install gcc gcc-c++ git glib2-devel libfdt-devel pixman-devel zlib-devel bzip2 make python2
+
+# Build qemu
+RUN git clone https://github.com/xiw/qemu.git -b 6.828-2.3.0 /qemu
+
+WORKDIR /qemu
+RUN ./configure --disable-kvm --python=python2 --target-list="i386-softmmu"
+RUN make -j
+
+# install to /usr/local/bin/qemu-*
+RUN make install
+
+# run qemu by default
+WORKDIR /workdir
+ENTRYPOINT [ "/usr/local/bin/qemu-system-i386" ]
