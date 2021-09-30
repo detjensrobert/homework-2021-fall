@@ -54,3 +54,41 @@ when are states recognised?
   - externally: when X% of UN agree it is a state - (yeah ok youre a state)
   - internally: some people have decided they rule over some territory - (we are now a state)
   - does being a state require external recognition?
+
+---
+
+# Lecture 2 - 9/29
+
+anarchy (no authority) <---> (complete authority) hegemony
+
+hegemony: absolute control over everything
+hegemon: leader of a hegemony
+
+polarity: counting # of great powers
+
+what *are* the great powers?
+
+what is power?
+  - how much a state can influence other states into doing what they want
+  - military size / power
+
+
+
+great powers are the states that possess much more power than the average state
+
+current great powers:
+  - China
+  - USA
+  - ~~India~~
+  - UK
+  - Russia
+  - ~~SA~~
+  - ~~Germany~~
+  - France
+  - ~~Japan~~
+  - ~~Brazil~~
+
+
+Unipolarity - one state that dominates international structures, e.g. US circa 1992..01? post Cold War
+Bipolarity - two main powers, essentially balanced, e.g. US vs USSR in Cold War (NATO vs Warsaw Pact)
+Multipolarity - several main powers, usually 3-7, most of history is this
