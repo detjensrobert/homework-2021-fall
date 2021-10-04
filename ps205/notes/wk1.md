@@ -12,6 +12,10 @@ three (main) kinds:
 ## Theories
 
 realism (fear, power)
+  - states seek security / power
+  - interests of different states often in conflict
+  - interactions usually bargaining / coersion
+
   - classical
   - neo-classical
   - structural (neo-)
@@ -21,6 +25,10 @@ realism (fear, power)
   - really about: *why do we fight?*, conflict, war
 
 liberalism (economics)
+  - shared common economic interests
+  - cooperation to increase wealth
+  - conflict when actors dont carry though with common interests
+
   - NOT LIBERAL re: US POLITICS
   - how you view the world
   - classical
@@ -36,6 +44,7 @@ social constructivism
   - dependent on agreement between people
   - knowledge & truth is dependent upon social interactions
   - identity affecting global politics
+
 
 
 sovereignty
