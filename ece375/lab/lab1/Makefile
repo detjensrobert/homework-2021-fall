@@ -11,6 +11,7 @@ flash: $(PROG)_out.hex
 	avrdude -p m128 -c usbasp -B12 -U flash:w:$(PROG)_out.hex:i
 
 sim:
+	echo 'target remote localhost:$(GDBPORT)' > .gdbinit
 	simavr --gdb $(GDBPORT) --mcu atmega128 $(PROG)_out.hex
 
 clean:
