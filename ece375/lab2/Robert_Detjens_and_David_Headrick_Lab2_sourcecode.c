@@ -56,7 +56,7 @@ int main(void) {
 
       // since it is the same bits just inverted,
       // do some coolguy bitmath to not need a conditional B)
-      PORTB = (~reading & 0b00000011) << 5;
+      PORTB = ~reading << 5;
       _delay_ms(1000);
     }
 
