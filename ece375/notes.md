@@ -108,6 +108,35 @@ ex: `ADD x`
 1. `MDR` <- `mem[MAR]`
 2. `AC`  <- `AC` + `MDR`
 
-ex: `JMP`
+ex: `JMP x`
 
 1. `PC`  <- `MDR` (addr)
+
+ex: `BNE x`
+
+1. `PC`  <- `MDR` *if* `Z` not set
+  - `Z` being the zero flag, set if the last ALU op == 0
+
+
+### Effective Address
+
+`LDA (x)` -- () for indirect
+operand is address of address of actual value
+
+1. `MDR` <- `mem[MAR]`
+2. `MAR` <- `MDR`
+3. `MDR` <- `mem[MAR]`
+4. `AC`  <- `MDR`
+
+`LDA -(x)` -- indirect pre decrement
+
+1. `MDR` <- `mem[MAR]`
+2. `AC`  <- `MDR`
+3. `AC`  <- `AC` - 1
+4. `MDR` <- `AC`
+5. `mem[MAR]` <- `MDR`
+6. `MAR` <- `MDR`
+7. `MDR` <- `mem[MAR]`
+8. `AC`  <- `MD
+
+Sometimes a temp / secondary working register is needed, eg for STA -(x) where AC is otherwise occupied
