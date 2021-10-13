@@ -137,6 +137,6 @@ operand is address of address of actual value
 5. `mem[MAR]` <- `MDR`
 6. `MAR` <- `MDR`
 7. `MDR` <- `mem[MAR]`
-8. `AC`  <- `MD
+8. `AC`  <- `MDR`
 
 Sometimes a temp / secondary working register is needed, eg for STA -(x) where AC is otherwise occupied
