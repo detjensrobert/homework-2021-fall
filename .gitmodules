@@ -1,3 +1,6 @@
 [submodule "cs444/lab1/jos"]
 	path = cs444/jos
 	url = git@gitlab.unexploitable.systems:detjensrobert/jos.git
+[submodule "cs461/group-project"]
+	path = cs461/group-project
+	url = git@github.com:detjensrobert/capstone-group-project.git
