@@ -1,8 +1,9 @@
 ;***********************************************************
 ;*
-;*  Robert Detjens & David Headrick -- Lab  4 sourcecode
+;*  Robert Detjens & David Headrick -- Lab  4 CHALLENGE code`
 ;*
 ;*  This code interacts with the LCD and data/program memory.
+;*  Also shifts the bytes around on other button presses.
 ;*
 ;***********************************************************
 ;*
@@ -28,6 +29,8 @@
 ; button definitions
 .equ     BUTT0 = 0b11111110
 .equ     BUTT1 = 0b11111101
+.equ     BUTT5 = 0b11011111
+.equ     BUTT6 = 0b10111111
 .equ     BUTT7 = 0b01111111
 
 ;***********************************************************
@@ -90,17 +93,69 @@ MAIN:              ; The Main program
       rcall   LCDWrLn2
     NO1:
 
+    cpi   mpr,   BUTT5
+    brne  NO5
+      ; button 5: rotate left
+
+      ; start at end of strings, 0x011F
+      ; X is one ahead
+      ldi   XL,   0x20
+      ldi   XH,   0x01
+      ldi   YL,   0x1F
+      ldi   YH,   0x01
+      swap_l_loop:
+        ; swap end value all the way to the start
+        ld    r1,   -X
+        ld    r2,   -Y
+        st    X,    r2
+        st    Y,    r1
+        cpi   YL,   0x00
+        brne  swap_l_loop
+
+      ; update display
+      rcall   LCDWrLn1
+      rcall   LCDWrLn2
+
+      ; wait a bit so it onlt moves once
+      ldi 	waitcnt,	25
+      rcall	WAIT
+    NO5:
+
+    cpi   mpr,   BUTT6
+    brne  NO6
+      ; button 6: rotate right
+
+      ; start at start of strings, 0x0100
+      ; X is one ahead
+      ldi   XL,   0x01
+      ldi   XH,   0x01
+      ldi   YL,   0x00
+      ldi   YH,   0x01
+      swap_r_loop:
+        ; swap end value all the way to the end
+        ld    r1,   X
+        ld    r2,   Y
+        st    X+,    r2
+        st    Y+,    r1
+        cpi   YL,   0x1F
+        brne  swap_r_loop
+
+      ; update display
+      rcall   LCDWrLn1
+      rcall   LCDWrLn2
+
+      ; wait a bit so it onlt moves once
+      ldi 	waitcnt,	25
+      rcall	WAIT
+    NO6:
+
     cpi   mpr,   BUTT7
     brne  NO7
       ; button 7: clear
       rcall   LCDClr
     NO7:
 
-		; wait a bit
-		ldi 	waitcnt,	10
-		rcall	WAIT
-
-		rjmp	MAIN			; jump back to main and create an infinite
+    rjmp  MAIN      ; jump back to main and create an infinite
                     ; while loop.  Generally, every main program is an
                     ; infinite while loop, never let the main program
                     ; just run off
@@ -133,7 +188,7 @@ LOAD_STRINGS:              ; Begin a function with a label
     ; String 2
     ldi     ZL,   low(HELLOSTR_S << 1)
     ldi     ZH,   high(HELLOSTR_S << 1)
-    ; dest addr in data memory (0x0100)
+    ; dest addr in data memory (0x0110)
     ldi     YL,   $10
     ldi     YH,   $01
     str2_l:
