@@ -1,3 +1,5 @@
 *.hex
 *.obj
 *.elf
+
+!lab*/*report.pdf
