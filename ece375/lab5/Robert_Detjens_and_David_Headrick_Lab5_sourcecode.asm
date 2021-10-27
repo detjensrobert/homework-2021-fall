@@ -47,15 +47,15 @@
 ; Program Initialization
 ;-----------------------------------------------------------
 INIT:
-		; Initialize the Stack Pointer
+    ; Initialize the Stack Pointer
     ldi         mpr,low(RAMEND)
     out         SPL, mpr
     ldi         mpr,high(RAMEND)
     out         SPH, mpr
 
   clr  zero  	; Set the zero register to zero, maintain
-							; these semantics, meaning, don't
-							; load anything else into it.
+              ; these semantics, meaning, don't
+              ; load anything else into it.
 
 ;-----------------------------------------------------------
 ; Main Program
@@ -63,40 +63,82 @@ INIT:
 MAIN:      	; The Main program
   ; Setup the ADD16 function direct test
 
-    ; Move values 0xFCBA and 0xFFFF in program memory to data memory
-    ; memory locations where ADD16 will get its inputs from
-    ; (see "Data Memory Allocation" section below)
+  ; Move values 0xFCBA and 0xFFFF in program memory to data memory memory
+  ; locations where ADD16 will get its inputs from (see "Data Memory Allocation"
+  ; section below)
+  ; source addr in prog memory
+  ldi   ZL,   low(ADD16_D1 << 1)
+  ldi   ZH,   high(ADD16_D1 << 1)
+  ; store in data memory
+  ldi   YL,   low(ADD16_OP1)
+  ldi   YH,   high(ADD16_OP1)
+  ; store two bytes
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  ; store the second operand (directly contiguous)
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  lpm     mpr,  Z+
+  st      Y+,   mpr
 
-  nop ; Check load ADD16 operands (Set Break point here #1)
-    ; Call ADD16 function to test its correctness
-    ; (calculate FCBA + FFFF)
-
-  nop ; Check ADD16 result (Set Break point here #2)
-    ; Observe result in Memory window
+  nop             ; Check load ADD16 operands (Set Break point here #1)
+  rcall   ADD16   ; (calculate FCBA + FFFF)
+  nop             ; Check ADD16 result (Set Break point here #2)
 
   ; Setup the SUB16 function direct test
+  ; source addr in prog memory
+  ldi   ZL,   low(SUB16_D1 << 1)
+  ldi   ZH,   high(SUB16_D1 << 1)
+  ; store in data memory
+  ldi   YL,   low(SUB16_OP1)
+  ldi   YH,   high(SUB16_OP1)
+  ; store two bytes
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  ; store two more bytes for the second operand (directly contiguous)
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  lpm     mpr,  Z+
+  st      Y+,   mpr
 
-    ; Move values 0xFCB9 and 0xE420 in program memory to data memory
-    ; memory locations where SUB16 will get its inputs from
-
-  nop ; Check load SUB16 operands (Set Break point here #3)
-    ; Call SUB16 function to test its correctness
-    ; (calculate FCB9 - E420)
-
-  nop ; Check SUB16 result (Set Break point here #4)
-    ; Observe result in Memory window
+  nop             ; Check load SUB16 operands (Set Break point here #3)
+  rcall   SUB16   ; (calculate FCB9 - E420)
+  nop             ; Check SUB16 result (Set Break point here #4)
 
   ; Setup the MUL24 function direct test
 
-    ; Move values 0xFFFFFF and 0xFFFFFF in program memory to data memory
-    ; memory locations where MUL24 will get its inputs from
+  ; source addr in prog memory
+  ldi   ZL,   low(MUL24_D1 << 1)
+  ldi   ZH,   high(MUL24_D1 << 1)
+  ; store in data memory
+  ldi   YL,   low(MUL24_OP1)
+  ldi   YH,   high(MUL24_OP1)
+  ; store three bytes
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  ; discard padding byte
+  lpm     mpr,  Z+
+  ; store three more bytes for the second operand (directly contiguous)
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  lpm     mpr,  Z+
+  st      Y+,   mpr
+  ; discard padding byte
+  lpm     mpr,  Z+
 
-  nop ; Check load MUL24 operands (Set Break point here #5)
-    ; Call MUL24 function to test its correctness
-    ; (calculate FFFFFF * FFFFFF)
-
-  nop ; Check MUL24 result (Set Break point here #6)
-    ; Observe result in Memory window
+  nop             ; Check load MUL24 operands (Set Break point here #5)
+  rcall   MUL24   ; (calculate FFFFFF * FFFFFF)
+  nop             ; Check MUL24 result (Set Break point here #6)
 
   nop ; Check load COMPOUND operands (Set Break point here #7)
   ; Call the COMPOUND function
@@ -119,16 +161,35 @@ DONE:	rjmp	DONE  	; Create an infinite while loop to signify the
 ;-----------------------------------------------------------
 ADD16:
   ; Load beginning address of first operand into X
-  ldi  XL, low(ADD16_OP1)	; Load low byte of address
-  ldi  XH, high(ADD16_OP1)	; Load high byte of address
+  ldi  XL, low(ADD16_OP1)
+  ldi  XH, high(ADD16_OP1)
 
   ; Load beginning address of second operand into Y
+  ldi  YL, low(ADD16_OP2)
+  ldi  YH, high(ADD16_OP2)
 
   ; Load beginning address of result into Z
+  ldi  ZL, low(ADD16_Result)
+  ldi  ZH, high(ADD16_Result)
 
-  ; Execute the function
 
-  ret      ; End a function with RET
+  ; add low bytes
+  ld    A,    X+
+  ld    B,    Y+
+  add   A,    B
+  st    Z+,   A
+  ; add high bytes with carry
+  ld    A,    X+
+  ld    B,    Y+
+  adc   A,    B
+  st    Z+,   A
+  ; store extra bit if carry
+  brcc  ADD_nocarry
+  ldi   mpr,  1
+  st    Z,    mpr  ; if carry, set overflow in next byte
+  ADD_nocarry:
+
+  ret
 
 ;-----------------------------------------------------------
 ; Func: SUB16
@@ -136,10 +197,38 @@ ADD16:
 ;  result.
 ;-----------------------------------------------------------
 SUB16:
-  ; Execute the function here
 
+  ; Load beginning address of first operand into X
+  ldi  XL, low(SUB16_OP1)
+  ldi  XH, high(SUB16_OP1)
 
-  ret      ; End a function with RET
+  ; Load beginning address of second operand into Y
+  ldi  YL, low(SUB16_OP2)
+  ldi  YH, high(SUB16_OP2)
+
+  ; Load beginning address of result into Z
+  ldi  ZL, low(SUB16_Result)
+  ldi  ZH, high(SUB16_Result)
+
+  ; Execute the function
+
+  ; subract low bytes
+  ld    A,    X+
+  ld    B,    Y+
+  sub   A,    B
+  st    Z+,   A
+  ; subtract high bytes with carry borrow
+  ld    A,    X+
+  ld    B,    Y+
+  sbc   A,    B
+  st    Z+,   A
+  ; store extra bit if carry
+  brcc  SUB_nocarry
+  ldi   mpr,  1
+  st    Z,    mpr  ; if carry, set overflow in next byte
+  SUB_nocarry:
+
+  ret
 
 ;-----------------------------------------------------------
 ; Func: MUL24
@@ -150,7 +239,7 @@ MUL24:
   ; Execute the function here
 
 
-  ret      ; End a function with RET
+  ret
 
 ;-----------------------------------------------------------
 ; Func: COMPOUND
@@ -173,7 +262,7 @@ COMPOUND:
   ; Setup the MUL24 function with ADD16 result as both operands
   ; Perform multiplication to calculate ((D - E) + F)^2
 
-  ret      ; End a function with RET
+  ret
 
 ;-----------------------------------------------------------
 ; Func: MUL16
@@ -263,13 +352,13 @@ MUL16_ILOOP:
 ; Desc: Cut and paste this and fill in the info at the
 ;  beginning of your functions
 ;-----------------------------------------------------------
-FUNC:      	; Begin a function with a label
+FUNC:
   ; Save variable by pushing them to the stack
 
   ; Execute the function here
 
   ; Restore variable by popping them from the stack in reverse order
-  ret      ; End a function with RET
+  ret
 
 
 ;***********************************************************
@@ -279,18 +368,30 @@ FUNC:      	; Begin a function with a label
 ; Enter any stored data you might need here
 
 ; ADD16 operands
+ADD16_D1:
+  .DW 0xFCBA
+ADD16_D2:
+  .DW 0xFFFF
 
 ; SUB16 operands
+SUB16_D1:
+  .DW 0xFCB9
+SUB16_D2:
+  .DW 0xE420
 
 ; MUL24 operands
+MUL24_D1:
+  .DB 0xFF, 0xFF, 0xFF, 0 ; extra byte for 16b alignment
+MUL24_D2:
+  .DB 0xFF, 0xFF, 0xFF, 0 ; extra byte for 16b alignment
 
 ; Compoud operands
 OperandD:
-	.DW	0xFCBA    ; test value for operand D
+  .DW	0xFCBA    ; test value for operand D
 OperandE:
-	.DW	0x2019    ; test value for operand E
+  .DW	0x2019    ; test value for operand E
 OperandF:
-	.DW	0x21BB    ; test value for operand F
+  .DW	0x21BB    ; test value for operand F
 
 ;***********************************************************
 ;*	Data Memory Allocation
@@ -305,15 +406,39 @@ LAddrP:	.byte 4
 ; Below is an example of data memory allocation for ADD16.
 ; Consider using something similar for SUB16 and MUL24.
 
-.org	$0110    ; data memory allocation for operands
+.org	$0110   ; data memory allocation for operands
 ADD16_OP1:
-  .byte 2    ; allocate two bytes for first operand of ADD16
+  .byte 2     ; allocate two bytes for first operand of ADD16
 ADD16_OP2:
-  .byte 2    ; allocate two bytes for second operand of ADD16
+  .byte 2     ; allocate two bytes for second operand of ADD16
 
-.org	$0120    ; data memory allocation for results
+.org	$0120   ; data memory allocation for results
 ADD16_Result:
+  .byte 3     ; allocate three bytes for ADD16 result
+
+; SUB16 reservations
+
+.org	$0130   ; data memory allocation for operands
+SUB16_OP1:
+  .byte 2     ; allocate two bytes for first operand of ADD16
+SUB16_OP2:
+  .byte 2     ; allocate two bytes for second operand of ADD16
+
+.org	$0140   ; data memory allocation for results
+SUB16_Result:
   .byte 3    ; allocate three bytes for ADD16 result
+
+; MUL24 reservations
+
+.org	$0150   ; data memory allocation for operands
+MUL24_OP1:
+  .byte 3     ; allocate two bytes for first operand of ADD16
+MUL24_OP2:
+  .byte 3     ; allocate two bytes for second operand of ADD16
+
+.org	$0160   ; data memory allocation for results
+MUL24_Result:
+  .byte 6    ; allocate 6 bytes for ADD16 result
 
 ;***********************************************************
 ;*	Additional Program Includes
