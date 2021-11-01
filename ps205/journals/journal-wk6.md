@@ -27,7 +27,7 @@ grievances through normal political channels. Internal groups can have a very st
 ties, helping them work together in rebellion. External actors can also fight by proxy, supporting opposite sides in the
 conflict (e.g. Vietnam War, US vs. USSR).
 
-Once the rebel group has ammassed power, they now have negotiation power because of the threat of civil war. There may
+Once the rebel group has amassed power, they now have negotiation power because of the threat of civil war. There may
 not be any actual war if both actors are able to settle (as with inter-state war). However, the problems that cause
 civil war and unrest are usually more deeply rooted and not easily solved, or an immediate war may be preferrable since
 the rebels' power may not be as secure as the government's.
