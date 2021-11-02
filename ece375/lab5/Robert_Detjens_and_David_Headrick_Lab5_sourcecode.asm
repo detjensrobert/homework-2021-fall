@@ -126,15 +126,16 @@ MAIN:      	; The Main program
   st      Y+,   mpr
   ; discard padding byte
   lpm     mpr,  Z+
-  ; store three more bytes for the second operand (directly contiguous)
+  ; load addr of dest (contiguous in program memory)
+  ldi   YL,   low(MUL24_OP2)
+  ldi   YH,   high(MUL24_OP2)
+  ; store second operand
   lpm     mpr,  Z+
   st      Y+,   mpr
   lpm     mpr,  Z+
   st      Y+,   mpr
   lpm     mpr,  Z+
   st      Y+,   mpr
-  ; discard padding byte
-  lpm     mpr,  Z+
 
   nop             ; Check load MUL24 operands (Set Break point here #5)
   rcall   MUL24   ; (calculate FFFFFF * FFFFFF)
@@ -222,13 +223,9 @@ SUB16:
   ld    B,    Y+
   sbc   A,    B
   st    Z+,   A
-  ; store extra bit if carry
-  brcc  SUB_nocarry
-  ldi   mpr,  1
-  st    Z,    mpr  ; if carry, set overflow in next byte
-  SUB_nocarry:
 
   ret
+
 
 ;-----------------------------------------------------------
 ; Func: MUL24
@@ -238,8 +235,161 @@ SUB16:
 MUL24:
   ; Execute the function here
 
+  ; Load beginning address of first operand into X
+  ldi  XL, low(MUL24_OP1)
+  ldi  XH, high(MUL24_OP1)
+
+  ; Load beginning address of second operand into Y
+  ldi  YL, low(MUL24_OP2)
+  ldi  YH, high(MUL24_OP2)
+
+  ; Load beginning address of result into Z
+  ldi  ZL, low(MUL24_Result)
+  ldi  ZH, high(MUL24_Result)
+
+  ldi   OLoop,  24
+  MUL24_loop:
+    ; shift current LSB out of op2
+    rcall   LSR24
+
+    ; add op1 to total if that shifted bit is 1
+    brcc    MUL24_noadd
+      rcall   ADD48
+    MUL24_noadd:
+
+    ; shift op1 left
+    rcall   LSL48
+
+    ; do this 24 times, one for each bit on op2
+    dec     OLoop
+    brne    MUL24_loop
 
   ret
+
+
+;-----------------------------------------------------------
+; Func: LSR24
+; Desc: Shifts one 24-bit value in memory right one bit.
+;-----------------------------------------------------------
+LSR24:
+  ; Execute the function here
+
+
+  push OLoop
+  push mpr
+  push	XH    ; Save X-ptr
+  push	XL
+
+  ; Load address of highest + 1 (becuase of predec) of operand into X
+  ldi  XL, low(MUL24_OP2) + 4
+  ldi  XH, high(MUL24_OP2)
+
+  clc
+  ldi   OLoop,  3
+  LSR24_loop:
+    ; shift three bytes (using rotate to propagate carry)
+    ld    mpr,  -X
+    ror   mpr
+    st    X,   mpr
+    dec   OLoop
+    brne  LSR24_loop
+
+  pop  XL
+  pop  XH
+  pop mpr
+  pop OLoop
+
+  ret
+
+
+
+;-----------------------------------------------------------
+; Func: LSL48
+; Desc: Shifts one 24-bit value in memory right one bit.
+;-----------------------------------------------------------
+LSL48:
+  ; Execute the function here
+
+  push OLoop
+  push mpr
+  push	XH    ; Save X-ptr
+  push	XL
+
+  ; Load beginning address operand into X
+  ldi  XL, low(MUL24_OP2)
+  ldi  XH, high(MUL24_OP2)
+
+  clc
+  ldi   OLoop,  6
+  LSL48_loop:
+    ; shift three bytes (using rotate to propagate carry)
+    ld    mpr,  X
+    rol   mpr
+    st    X+,   mpr
+    dec   OLoop
+    brne  LSL48_loop
+
+  pop  XL
+  pop  XH
+  pop mpr
+  pop OLoop
+
+  ret
+
+
+;-----------------------------------------------------------
+; Func: ADD48
+; Desc: Multiplies two 24-bit numbers in X and Y and stores
+;       the result in Z.
+;-----------------------------------------------------------
+ADD48:
+  ; Execute the function here
+
+  push OLoop
+  push A
+  push B
+  push mpr
+  push	XH    ; Save X-ptr
+  push	XL
+  push	YH    ; Save Y-ptr
+  push	YL
+
+  ; Load beginning address of first operand into X
+  ldi  XL, low(MUL24_OP1)
+  ldi  XH, high(MUL24_OP1)
+
+  ; Load beginning address of second operand / dest into Y
+  ldi  YL, low(MUL24_Result)
+  ldi  YH, high(MUL24_Result)
+
+  clc
+  ldi   OLoop,  6
+  ADD48_loop:
+    ; add all 6 bytes
+    ld    A,    X+
+    ld    B,    Y
+    adc   A,    B
+    st    Y+,   A
+    dec   OLoop
+    brne  ADD48_loop
+
+  ; store extra bit if carry
+  brcc  ADD48_nocarry
+    ldi   mpr,  1
+    st    Y,    mpr  ; if carry, set overflow in next byte
+  ADD48_nocarry:
+
+  pop  YL
+  pop  YH
+  pop  XL
+  pop  XH
+  pop mpr
+  pop B
+  pop A
+  pop OLoop
+
+  ret
+
 
 ;-----------------------------------------------------------
 ; Func: COMPOUND
@@ -420,21 +570,21 @@ ADD16_Result:
 
 .org	$0130   ; data memory allocation for operands
 SUB16_OP1:
-  .byte 2     ; allocate two bytes for first operand of ADD16
+  .byte 2
 SUB16_OP2:
-  .byte 2     ; allocate two bytes for second operand of ADD16
-
+  .byte 2
 .org	$0140   ; data memory allocation for results
 SUB16_Result:
-  .byte 3    ; allocate three bytes for ADD16 result
+  .byte 2
 
 ; MUL24 reservations
 
 .org	$0150   ; data memory allocation for operands
 MUL24_OP1:
-  .byte 3     ; allocate two bytes for first operand of ADD16
+  .byte 3     ; allocate three bytes for first operand
+  .byte 3     ; allocate three more for the shift
 MUL24_OP2:
-  .byte 3     ; allocate two bytes for second operand of ADD16
+  .byte 3     ; allocate three bytes for second operand
 
 .org	$0160   ; data memory allocation for results
 MUL24_Result:
