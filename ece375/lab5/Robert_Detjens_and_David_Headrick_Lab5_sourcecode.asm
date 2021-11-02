@@ -274,6 +274,26 @@ SUB16:
 MUL24:
   ; Execute the function here
 
+  ; make sure result is zero'd before doing computation
+  ldi  ZL, low(MUL24_Result)
+  ldi  ZH, high(MUL24_Result)
+  ldi   OLoop,  6
+  MUL24_init_result:
+    clr     mpr
+    st      Z+,   mpr
+    dec     OLoop
+    brne    MUL24_init_result
+
+  ; make sure op1 shiftspace is also zero'd
+  ldi  XL, low(MUL24_OP1) + 3
+  ldi  XH, high(MUL24_OP1)
+  ldi   OLoop,  3
+  MUL24_init_shift:
+    clr     mpr
+    st      X+,   mpr
+    dec     OLoop
+    brne    MUL24_init_shift
+
   ; Load beginning address of first operand into X
   ldi  XL, low(MUL24_OP1)
   ldi  XH, high(MUL24_OP1)
@@ -286,17 +306,6 @@ MUL24:
   ldi  ZL, low(MUL24_Result)
   ldi  ZH, high(MUL24_Result)
 
-  ; make sure result is zero'd before doing computation
-  ldi   OLoop,  6
-  MUL24_init:
-    clr     mpr
-    st      Z+,   mpr
-    dec     OLoop
-    brne    MUL24_init
-
-  ; reset Z back to start of result
-  ldi  ZL, low(MUL24_Result)
-  ldi  ZH, high(MUL24_Result)
 
   ldi   OLoop,  24
   MUL24_loop:
