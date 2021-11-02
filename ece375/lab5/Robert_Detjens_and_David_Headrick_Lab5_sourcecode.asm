@@ -286,6 +286,18 @@ MUL24:
   ldi  ZL, low(MUL24_Result)
   ldi  ZH, high(MUL24_Result)
 
+  ; make sure result is zero'd before doing computation
+  ldi   OLoop,  6
+  MUL24_init:
+    clr     mpr
+    st      Z+,   mpr
+    dec     OLoop
+    brne    MUL24_init
+
+  ; reset Z back to start of result
+  ldi  ZL, low(MUL24_Result)
+  ldi  ZH, high(MUL24_Result)
+
   ldi   OLoop,  24
   MUL24_loop:
     ; shift current LSB out of op2
