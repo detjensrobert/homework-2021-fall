@@ -23,8 +23,8 @@
 .def    ilcnt = r18                     ; Inner Loop Counter
 .def    olcnt = r19                     ; Outer Loop Counter
 
-.def    LW_count = r20
-.def    RW_count = r21
+.def    LW_count = r23
+.def    RW_count = r24
 
 .equ    WTime = 100                     ; Time to wait in wait loop
 
@@ -54,22 +54,17 @@
 ;*	Interrupt Vectors
 ;***********************************************************
 .org	$0000					; Beginning of IVs
-    rjmp	INIT			; Reset interrupt
+  rjmp	INIT			; Reset interrupt
 .org	$0002
-    jmp HitRight    ; IRQ0 Handler - right whisker input
+  jmp HitRight    ; IRQ0 Handler - right whisker input
 .org	$0004
-    jmp HitLeft     ; IRQ1 Handler - left whisker input
+  jmp HitLeft     ; IRQ1 Handler - left whisker input
 .org	$0006
-    jmp ClearRight  ; IRQ2 Handler - right whisker count clear
+  jmp ClearRight  ; IRQ2 Handler - right whisker count clear
 .org	$0008
-    jmp ClearLeft   ; IRQ3 Handler - left whisker count clear
+  jmp ClearLeft   ; IRQ3 Handler - left whisker count clear
 
-    ; Set up interrupt vectors for any interrupts being used
 
-    ; This is just an example:
-;.org	$002E					; Analog Comparator IV
-;		rcall	HandleAC		; Call function to handle interrupt
-;		reti					; Return from interrupt
 
 .org	$0046					; End of Interrupt Vectors
 
@@ -77,58 +72,60 @@
 ;*	Program Initialization
 ;***********************************************************
 INIT:							; The initialization routine
-    ; Initialize Stack Pointer
-    ldi		mpr, low(RAMEND)
-    out		SPL, mpr		; Load SPL with low byte of RAMEND
-    ldi		mpr, high(RAMEND)
-    out		SPH, mpr		; Load SPH with high byte of RAMEND
+  ; Initialize Stack Pointer
+  ldi		mpr, low(RAMEND)
+  out		SPL, mpr		; Load SPL with low byte of RAMEND
+  ldi		mpr, high(RAMEND)
+  out		SPH, mpr		; Load SPH with high byte of RAMEND
 
-    ; Initialize Port B for output
-    ldi		mpr, $00		; Initialize Port B for outputs
-    out		PORTB, mpr		; Port B outputs low
-    ldi		mpr, $FF		; Set Port B Directional Register
-    out		DDRB, mpr		; for output
+  ; Initialize Port B for output
+  ldi		mpr, $00		; Initialize Port B for outputs
+  out		PORTB, mpr		; Port B outputs low
+  ldi		mpr, $FF		; Set Port B Directional Register
+  out		DDRB, mpr		; for output
 
-    ; Initialize Port D for input
-    ldi		mpr, $FF		; Initialize Port D for inputs
-    out		PORTD, mpr		; with Tri-State
-    ldi		mpr, $00		; Set Port D Directional Register
-    out		DDRD, mpr		; for inputs
+  ; Initialize Port D for input
+  ldi		mpr, $FF		; Initialize Port D for inputs
+  out		PORTD, mpr		; with Tri-State
+  ldi		mpr, $00		; Set Port D Directional Register
+  out		DDRD, mpr		; for inputs
 
-    ; Initialize TekBot Foward Movement
-    ldi		mpr, MovFwd		; Load Move Foward Command
-    out		PORTB, mpr		; Send command to motors
+  ; Initialize TekBot Foward Movement
+  ldi		mpr, MovFwd		; Load Move Foward Command
+  out		PORTB, mpr		; Send command to motors
 
-    ; Clear registers
-    clr   LW_count
-    clr   RW_count
+  ; Clear registers
+  clr   LW_count
+  clr   RW_count
+  ldi   LW_count, 1
+  ldi   RW_count, 1
 
-    ; Clear LCD memory
-    ldi   olcnt,    $20
-    ldi   XL,       low(LCD_Line1)
-    ldi   XH,       high(LCD_Line1)
-    clr   mpr
-    Mem_init:
-      st      X+,   mpr
-      dec     olcnt
-      brne    Mem_init
+  ; Clear LCD memory
+  ldi   olcnt,    $20
+  ldi   XL,       low(LCD_Line1)
+  ldi   XH,       high(LCD_Line1)
+  clr   mpr
+  Mem_init:
+    st      X+,   mpr
+    dec     olcnt
+    brne    Mem_init
 
-    ; init LCD
-    call      LCDInit
+  ; init LCD
+  call      LCDInit
 
-    ; Initialize external interrupts
-    ; Set the Interrupt Sense Control to falling edge
-    ; Set INT0:3 to be on falling edge
-    ldi mpr, 0b10101010
-    sts EICRA, mpr
+  ; Initialize external interrupts
+  ; Set the Interrupt Sense Control to falling edge
+  ; Set INT0:3 to be on falling edge
+  ldi mpr, 0b10101010
+  sts EICRA, mpr
 
-    ; Configure the External Interrupt Mask
-    ldi mpr, 0b00001111
-    sts EIMSK, mpr
+  ; Configure the External Interrupt Mask
+  ldi mpr, 0b00001111
+  out EIMSK, mpr
 
-    ; Turn on interrupts
-    ; NOTE: This must be the last thing to do in the INIT function
-    sei
+  ; Turn on interrupts
+  ; NOTE: This must be the last thing to do in the INIT function
+  sei
 
 
 ;***********************************************************
@@ -159,9 +156,12 @@ MAIN:							; The Main program
 ; Desc: Clear the hit count register for left whisker
 ;-----------------------------------------------------------
 ClearLeft:
-  cli   ; disable interrupts
   clr   LW_count  ; clear counter register
-  sei   ; reenable interrupts
+
+  ; ; clear interrupt
+  ; ldi   mpr,    0b00001111
+  ; out   EIFR,   mpr
+
   reti
 
 ;-----------------------------------------------------------
@@ -169,9 +169,12 @@ ClearLeft:
 ; Desc: Clear the hit count register for right whisker
 ;-----------------------------------------------------------
 ClearRight:
-  cli   ; disable interrupts
   clr   RW_count  ; clear counter register
-  sei   ; reenable interrupts
+
+  ; ; clear interrupt
+  ; ldi   mpr,    0b00001111
+  ; out   EIFR,   mpr
+
   reti
 
 ;----------------------------------------------------------------
@@ -180,9 +183,6 @@ ClearRight:
 ;       is triggered.
 ;----------------------------------------------------------------
 HitRight:
-  ; immediately disable interrupts
-  cli
-
   push        mpr               ; Save mprregister
   push        waitcnt           ; Save waitregister
   in          mpr, SREG         ; Save programstate
@@ -211,8 +211,9 @@ HitRight:
 
   inc         RW_count          ; increment right whisker hit count
 
-  ; reenable interrupts once finished
-  sei
+  ; clear interrupt
+  ldi   mpr,    0b00001111
+  out   EIFR,   mpr
 
   reti                          ; Return from interrupt
 
@@ -222,9 +223,6 @@ HitRight:
 ;       is triggered.
 ;----------------------------------------------------------------
 HitLeft:
-  ; immediately disable interrupts
-  cli
-
   push        mpr               ; Save mprregister
   push        waitcnt           ; Save waitregister
   in          mpr, SREG         ; Save programstate
@@ -253,8 +251,9 @@ HitLeft:
 
   inc         LW_count          ; increment left whisker hit count
 
-  ; reenable interrupts once finished
-  sei
+  ; clear interrupt
+  ldi   mpr,    0b00001111
+  out   EIFR,   mpr
 
   reti                          ; Return from interrupt
 
