@@ -197,7 +197,11 @@ ADD16:
   brcc  ADD_nocarry
   ldi   mpr,  1
   st    Z,    mpr  ; if carry, set overflow in next byte
+  jmp   ADD_end
   ADD_nocarry:
+  ldi   mpr,  0
+  st    Z,    mpr  ; if not carry, clear overflow in next byte
+  ADD_end:
 
   pop  ZL
   pop  ZH
