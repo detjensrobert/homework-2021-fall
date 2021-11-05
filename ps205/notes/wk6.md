@@ -29,7 +29,6 @@ last week:
     - women have to act more like a man to get in?
     - selection bias
 
-
 levels of analysis (review):
 - individual
   - institutional contstraints
@@ -77,3 +76,94 @@ civil war solutions:
   - etc
 - external peace keeping/building/enforcement
   - e.g. UN
+
+
+## lecture 11/3
+
+- definition of war
+  - conflict btwn 2 parties with >= 1000 battle-related deaths within a year
+
+criticism of international institutions
+- representation
+- voice
+- transparency
+- dist. of power of ww2 are represent by UN P5 members, but power has changed
+- institutions are *not* states, so highly reliant on states to fund/enforce/etc
+  - states may not want to fund IGOs if they dont agree with policy
+
+- realists:
+  - IGOs is marginal actors -- states are the primary actors
+  - conflict of interest: why give up power to IGO?
+
+two-level games
+- domestic and international politics act on different levels
+  - domestic politics <--> international politics can affect each other
+  - internal dissonance within actor
+
+P5 members:
+- permanent 5 members of UN Security powers
+- posesss absolute veto on stuff
+  - US
+  - UK
+  - China
+  - Russia
+  - France
+
+Core principles of liberalism:
+- states are not the only primary actor
+- human nature are not inherently evil
+- intl. institutions can help ease anarchy
+
+structural liberalism
+- 5 components:
+  - security co-binding
+    - joining security alliances e.g. NATO / UN security council
+    - collective security organizations
+    - alliances: designed to defend/upset SQ
+    - sec c-b: maintain the status quo
+    - by joining, constraining soverignty to go against other powers
+  - penetrative hegemony
+    - regular hegemon: *complete* world control/domination
+    - US after cold was was hegemon -- unable to be toppled
+    - see US in 1999
+    - hegemon would help other states out but still is greatest power
+    - willing to listen to other powers
+    - multiple points of access for state/non-state actors to influence hegemon
+  - semi-soverignty
+  - economic openness
+  - civic identity
+    - idea of "the west", what democracy should be
+
+offensive neorealism:
+- concerned more about relative power rather than absolute power
+- dont always seek abs power, only when it improves relative stance
+- security dilemma
+
+defensive neorealism:
+- relative power & imperfect information -> security spirals -> conflict
+- more hesitant about increasing power
+  - more power, but less secure
+
+
+actual vs potential power:
+- stuff that can be turned into power
+  - territory
+  - population
+  - economic strength
+  - etc
+
+sources of:
+- liberalist power
+  - material power
+  - institutions
+  - norms
+    - shared beliefs / ideas / expectations within a group
+- realist power:
+  - material power (measureable)
+    - potential power
+
+iteration
+- repeated set of interations between any actors
+- leads to more information
+- interations are stateful
+- no restruction on who can interact
