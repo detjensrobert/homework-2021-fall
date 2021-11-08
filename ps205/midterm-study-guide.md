@@ -34,7 +34,7 @@ rather a tool to help students focus on key issues in the texts and lectures tha
 
 Realism is one of our core paradigms that is used to explain how interstate politics works. To be prepared for the exam
 it will be important to know the core assumptions that are the foundations of realist thinking. It will also be
-important to be able to identify the differences between classical realism and its variants, such as structural(neo)
+important to be able to identify the differenc  es between classical realism and its variants, such as structural(neo)
 realism, offensive realism, and defensive realism. Additionally, being able to know the distinctions and differences
 between realism (in general), liberalism will also be important. Who are the key actors in realist thought? What are the
 expected behaviors of these actors following realist thinking in interstate politics?

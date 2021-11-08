@@ -166,4 +166,4 @@ iteration
 - repeated set of interations between any actors
 - leads to more information
 - interations are stateful
-- no restruction on who can interact
+- no restruction on who can interac

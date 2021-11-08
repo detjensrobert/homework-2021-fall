@@ -32,4 +32,4 @@ not be any actual war if both actors are able to settle (as with inter-state war
 civil war and unrest are usually more deeply rooted and not easily solved, or an immediate war may be preferrable since
 the rebels' power may not be as secure as the government's.
 
-Terrorism may seem logically irrational, but is politically rational.
+Terrorism may seem logically irrational, but is politically rational.`
