@@ -1,15 +1,14 @@
 ;***********************************************************
 ;*
-;*	Enter Name of file here
+;*	Robert Detjens & David Headrick Lab 6 Source Code
 ;*
-;*	Enter the description of the program here
-;*
-;*	This is the skeleton file for Lab 6 of ECE 375
+;*	Basic Bump Bot, but now with interrupts!
 ;*
 ;***********************************************************
 ;*
-;*	 Author: Enter your name
-;*	   Date: Enter Date
+;*	 Author: Robert Detjens
+;*	         David Headrick
+;*	   Date: 11/9/21
 ;*
 ;***********************************************************
 
@@ -25,8 +24,6 @@
 
 .def    LW_count = r23
 .def    RW_count = r24
-
-.equ    WTime = 100                     ; Time to wait in wait loop
 
 .equ    WskrR = 0                       ; Right Whisker Input Bit
 .equ    WskrL = 1                       ; Left Whisker Input Bit
@@ -53,18 +50,20 @@
 ;***********************************************************
 ;*	Interrupt Vectors
 ;***********************************************************
-.org	$0000					; Beginning of IVs
+.org	$0000			  ; Beginning of IVs
   rjmp	INIT			; Reset interrupt
 .org	$0002
-  jmp HitRight    ; IRQ0 Handler - right whisker input
+  rcall HitRight    ; IRQ0 Handler - right whisker input
+  reti
 .org	$0004
-  jmp HitLeft     ; IRQ1 Handler - left whisker input
+  rcall HitLeft     ; IRQ1 Handler - left whisker input
+  reti
 .org	$0006
-  jmp ClearRight  ; IRQ2 Handler - right whisker count clear
+  rcall ClearRight  ; IRQ2 Handler - right whisker count clear
+  reti
 .org	$0008
-  jmp ClearLeft   ; IRQ3 Handler - left whisker count clear
-
-
+  rcall ClearLeft   ; IRQ3 Handler - left whisker count clear
+  reti
 
 .org	$0046					; End of Interrupt Vectors
 
@@ -97,8 +96,6 @@ INIT:							; The initialization routine
   ; Clear registers
   clr   LW_count
   clr   RW_count
-  ldi   LW_count, 1
-  ldi   RW_count, 1
 
   ; Clear LCD memory
   ldi   olcnt,    $20
@@ -112,6 +109,7 @@ INIT:							; The initialization routine
 
   ; init LCD
   call      LCDInit
+  rcall     UpdateLCD
 
   ; Initialize external interrupts
   ; Set the Interrupt Sense Control to falling edge
@@ -132,9 +130,16 @@ INIT:							; The initialization routine
 ;*	Main Program
 ;***********************************************************
 MAIN:							; The Main program
+  ; do nothing
+  rjmp      MAIN
 
-  ; update LCD
 
+
+;-----------------------------------------------------------
+; Func: UpdateLCD
+; Desc: Clear the hit count register for left whisker
+;-----------------------------------------------------------
+UpdateLCD:
   ; convert left count to string in LCD mem
   mov       mpr,  LW_count
   ldi       XL,   LOW(LCD_Line1)
@@ -149,7 +154,8 @@ MAIN:							; The Main program
 
   call      LCDWrite
 
-  rjmp      MAIN
+  ret
+
 
 ;-----------------------------------------------------------
 ; Func: ClearLeft
@@ -158,11 +164,13 @@ MAIN:							; The Main program
 ClearLeft:
   clr   LW_count  ; clear counter register
 
-  ; ; clear interrupt
-  ; ldi   mpr,    0b00001111
-  ; out   EIFR,   mpr
+  rcall   UpdateLCD
 
-  reti
+  ; clear interrupt
+  ldi   mpr,    0b00001111
+  out   EIFR,   mpr
+
+  ret
 
 ;-----------------------------------------------------------
 ; Func: ClearRight
@@ -171,11 +179,13 @@ ClearLeft:
 ClearRight:
   clr   RW_count  ; clear counter register
 
-  ; ; clear interrupt
-  ; ldi   mpr,    0b00001111
-  ; out   EIFR,   mpr
+  rcall   UpdateLCD
 
-  reti
+  ; clear interrupt
+  ldi   mpr,    0b00001111
+  out   EIFR,   mpr
+
+  ret
 
 ;----------------------------------------------------------------
 ; Sub:  HitRight
@@ -188,34 +198,38 @@ HitRight:
   in          mpr, SREG         ; Save programstate
   push        mpr               ;
 
+  inc         RW_count          ; increment right whisker hit count
+  rcall       UpdateLCD
+
   ; Move Backwards for a second
   ldi         mpr, MovBck       ; Load Move Backwardcommand
   out         PORTB, mpr        ; Send command toport
-  ldi         waitcnt, WTime    ; WaitFunc for 1 second
+  ldi         waitcnt, 100      ; WaitFunc for 1 second
   rcall       WaitFunc              ; Call waitfunction
 
   ; Turn left for a second
   ldi         mpr, TurnL        ; Load Turn LeftCommand
   out         PORTB, mpr        ; Send command toport
-  ldi         waitcnt, WTime    ; WaitFunc for 1second
+  ldi         waitcnt, 100      ; WaitFunc for 1second
   rcall       WaitFunc              ; Call waitfunction
 
   ; Move Forward again
   ldi         mpr, MovFwd       ; Load Move Forwardcommand
-  out         PORTB, mpr        ; Send command toport
+  out         PORTB, mpr        ; Send command to port
+  ldi         waitcnt, 50       ; move forward for 0.5s
+  rcall       WaitFunc
+
 
   pop         mpr               ; Restore programstate
   out         SREG, mpr         ;
   pop         waitcnt           ; Restore waitregister
   pop         mpr               ; Restorempr
 
-  inc         RW_count          ; increment right whisker hit count
-
   ; clear interrupt
   ldi   mpr,    0b00001111
   out   EIFR,   mpr
 
-  reti                          ; Return from interrupt
+  ret                           ; Return from interrupt
 
 ;----------------------------------------------------------------
 ; Sub:  HitLeft
@@ -228,34 +242,37 @@ HitLeft:
   in          mpr, SREG         ; Save programstate
   push        mpr               ;
 
+  inc         LW_count          ; increment left whisker hit count
+  rcall       UpdateLCD
+
   ; Move Backwards for a second
   ldi         mpr, MovBck       ; Load Move Backward command
   out         PORTB, mpr        ; Send command to port
-  ldi         waitcnt, WTime    ; WaitFunc for 1 second
+  ldi         waitcnt, 100      ; WaitFunc for 1 second
   rcall       WaitFunc              ; Call wait function
 
   ; Turn right for a second
   ldi         mpr, TurnR        ; Load Turn Left Command
   out         PORTB, mpr        ; Send command toport
-  ldi         waitcnt, WTime    ; WaitFunc for 1second
+  ldi         waitcnt, 100      ; WaitFunc for 1second
   rcall       WaitFunc              ; Call waitfunction
 
   ; Move Forward again
   ldi         mpr, MovFwd       ; Load Move Forward command
   out         PORTB, mpr        ; Send command to port
+  ldi         waitcnt, 50       ; move forward for 0.5s
+  rcall       WaitFunc
 
   pop         mpr               ; Restore program state
   out         SREG, mpr         ;
   pop         waitcnt           ; Restore wait register
   pop         mpr               ; Restorempr
 
-  inc         LW_count          ; increment left whisker hit count
-
   ; clear interrupt
   ldi   mpr,    0b00001111
   out   EIFR,   mpr
 
-  reti                          ; Return from interrupt
+  ret                           ; Return from interrupt
 
 ;----------------------------------------------------------------
 ; Sub:  WaitFunc

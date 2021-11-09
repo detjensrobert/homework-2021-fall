@@ -50,7 +50,7 @@ liberalists dont believe these
 if some places are missing one of the 3, zone cannot happen
 all three are needed for peace to occur
 
-## Democratic peace theory:
+## Democratic eory:
 
 looking at states relationships with one other:
 - democratic states dont fight wars with each other
