@@ -24,6 +24,16 @@
 .equ  EngDirR = 5   ; right Engine Direction Bit
 .equ  EngDirL = 6   ; left Engine Direction Bit
 
+; Timer config bits
+.equ  FOCx   = 1 << 7
+.equ  WGMx0  = 1 << 6
+.equ  COMx1  = 1 << 5
+.equ  COMx0  = 1 << 4
+.equ  WGMx1  = 1 << 3
+.equ  CSx2   = 1 << 2
+.equ  CSx1   = 1 << 1
+.equ  CSx0   = 1 << 0
+
 ;***********************************************************
 ;*  Start of Code Segment
 ;***********************************************************
@@ -88,8 +98,9 @@ INIT:
   ; Configure 8-bit Timer/Counters
 
   ; Enable PWM with no prescaling, set on OCR clear on overflow.
-  ldi mpr,    0b01101001  ; WGM00 | WGM01 | COM01 | CS00
+  ldi mpr,    WGMx0 | WGMx1 | COMx1 | CSx0
   out TCCR0,  mpr   ; T/C 0
+
   out TCCR2,  mpr   ; T/C 2
 
   ; Set TekBot to Move Forward (1<<EngDirR|1<<EngDirL)
