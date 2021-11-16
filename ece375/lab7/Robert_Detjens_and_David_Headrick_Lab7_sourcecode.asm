@@ -6,7 +6,7 @@
 ;*
 ;*   Author: Robert Detjens
 ;*           David Headrick
-;*     Date: 11/10/21
+;*     Date: 11/16/21
 ;*
 ;***********************************************************
 
@@ -120,11 +120,7 @@ INIT:
 ;*  Main Program
 ;***********************************************************
 MAIN:
-  ; poll Port D pushbuttons (if needed)
-
-  ; if pressed, adjust speed
-  ; also, adjust speed indication
-
+  ; everything is handled in interrput handlers
   rjmp  MAIN    ; return to top of MAIN
 
 ;***********************************************************
