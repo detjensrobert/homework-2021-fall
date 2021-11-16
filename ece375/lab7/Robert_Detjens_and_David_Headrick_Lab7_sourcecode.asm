@@ -15,9 +15,12 @@
 ;***********************************************************
 ;*  Internal Register Definitions and Constants
 ;***********************************************************
-.def  mpr       = r16   ; Multipurpose register
-.def  curr_speed = r17   ; current speed level (0-15) * 17
+.def  mpr        = r16  ; Multipurpose register
+.def  curr_speed = r17  ; current speed level (0-15) * 17
 
+.def  waitcnt = r20   ; WaitFunc Loop Counter
+.def  ilcnt = r21     ; Inner Loop Counter
+.def  olcnt = r22     ; Outer Loop Counter
 
 .equ  EngEnR = 4    ; right Engine Enable Bit
 .equ  EngEnL = 7    ; left Engine Enable Bit
@@ -73,16 +76,16 @@ INIT:
   ; Configure I/O ports
 
   ; Initialize Port B for output
-  ldi		mpr, $00		; Initialize Port B for outputs
-  out		PORTB, mpr	; Port B outputs low
   ldi		mpr, $FF		; Set Port B Directional Register
   out		DDRB, mpr		; for output
+  ldi		mpr, $00		; Initialize Port B for outputs
+  out		PORTB, mpr	; Port B outputs low
 
   ; Initialize Port D for input
-  ldi		mpr, $FF		; Initialize Port D for inputs
-  out		PORTD, mpr	; with Tri-State
   ldi		mpr, $00		; Set Port D Directional Register
   out		DDRD, mpr		; for inputs
+  ldi		mpr, $FF		; Initialize Port D for inputs
+  out		PORTD, mpr	; with pull-up
 
   ; Configure External Interrupts, if needed
 
@@ -100,7 +103,6 @@ INIT:
   ; Enable PWM with no prescaling, set on OCR clear on overflow.
   ldi mpr,    WGMx0 | WGMx1 | COMx1 | CSx0
   out TCCR0,  mpr   ; T/C 0
-
   out TCCR2,  mpr   ; T/C 2
 
   ; Set TekBot to Move Forward (1<<EngDirR|1<<EngDirL)
@@ -120,8 +122,8 @@ INIT:
 MAIN:
   ; poll Port D pushbuttons (if needed)
 
-        ; if pressed, adjust speed
-        ; also, adjust speed indication
+  ; if pressed, adjust speed
+  ; also, adjust speed indication
 
   rjmp  MAIN    ; return to top of MAIN
 
@@ -137,6 +139,10 @@ SpeedMax:
 
   ldi   curr_speed,   15
   rcall UpdateTimers
+
+  ; delay a bit for debounce
+  ldi   mpr,   1
+  rcall WaitFunc
 
   ; clear interrupt
   ldi   mpr,    0b00001111
@@ -157,6 +163,10 @@ SpeedInc:
   Inc_noop:
   rcall UpdateTimers
 
+  ; delay a bit for debounce
+  ldi   mpr,   1
+  rcall WaitFunc
+
   ; clear interrupt
   ldi   mpr,    0b00001111
   out   EIFR,   mpr
@@ -176,6 +186,10 @@ SpeedDec:
   Dec_noop:
   rcall UpdateTimers
 
+  ; delay a bit for debounce
+  ldi   mpr,   1
+  rcall WaitFunc
+
   ; clear interrupt
   ldi   mpr,    0b00001111
   out   EIFR,   mpr
@@ -190,6 +204,10 @@ SpeedMin:
 
   ldi   curr_speed,   0
   rcall UpdateTimers
+
+  ; delay a bit for debounce
+  ldi   mpr,   1
+  rcall WaitFunc
 
   ; clear interrupt
   ldi   mpr,    0b00001111
@@ -208,16 +226,48 @@ UpdateTimers:
   ldi		mpr,    (1<<EngDirR|1<<EngDirL)
   or    mpr,    curr_speed
   out   PORTB,  mpr
+
   ; convert speed level to timer match value
-  ldi   mpr,    17
-  mul   mpr,    curr_speed
+  ; mpr * 17 == mpr * 16 + mpr == mpr << 4 + mpr
+  mov   mpr,    curr_speed
+  lsl   mpr
+  lsl   mpr
+  lsl   mpr
+  lsl   mpr
+  add   mpr,    curr_speed
+
   out   OCR0,   mpr
   out   OCR2,   mpr
 
   pop   mpr
   ret
 
+;----------------------------------------------------------------
+; Sub:  WaitFunc
+; Desc: A wait loop that is 16 + 159975*waitcnt cycles or roughly
+;       waitcnt*10ms.  Just initialize wait for the specific amount
+;       of time in 10ms intervals. Here is the general eqaution
+;       for the number of clock cycles in the wait loop:
+;       ((3 * ilcnt + 3) * olcnt + 3) * waitcnt + 13 + call
+;----------------------------------------------------------------
+WaitFunc:
+  push         waitcnt          ; Save waitregister
+  push         ilcnt            ; Save ilcntregister
+  push         olcnt            ; Save olcntregister
 
+  Loop:   ldi   olcnt, 224        ; load olcnt register
+    OLoop:  ldi   ilcnt, 50        ; load ilcnt register
+      ILoop:  dec   ilcnt             ; decrement ilcnt
+        brne        ILoop             ; Continue InnerLoop
+      dec         olcnt             ; decrementolcnt
+      brne        OLoop             ; Continue OuterLoop
+    dec         waitcnt           ; Decrementwait
+    brne        Loop              ; Continue Funcloop
+
+  pop         olcnt             ; Restore olcntregister
+  pop         ilcnt             ; Restore ilcntregister
+  pop         waitcnt           ; Restore waitregister
+  ret                           ; Return fromsubroutine
 
 ;***********************************************************
 ;*  Stored Program Data
