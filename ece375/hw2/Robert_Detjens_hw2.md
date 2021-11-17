@@ -1,4 +1,4 @@
-# ECE 375 Homework 1
+# ECE 375 Homework 2
 
 ## Robert Detjens
 
