@@ -53,7 +53,20 @@
 <h1>Goals</h1>
 <ul>
 <li>Make it easy for developers to deploy containerized applications to a K8S cluster</li>
-<li></li>
+<li>Operate at a lower operating cost compared to industry solutions</li>
+<li>Provide scalability, either up or down</li>
+<li>Intuitive and easy to use for end users</li>
+</ul>
+</section>
+
+<section id="deliverables" class="title-slide slide level1">
+<h1>Deliverables</h1>
+<ul>
+<li>Kubernetes deployed on Raspberry Pi devices</li>
+<li>Deployment pipeline running on a cluster of Raspberry Pi devices</li>
+<li>Able to deploy a user’s service to the Kubernetes cluster from a user-provided config file</li>
+<li>User must be able to access pipeline from local network</li>
+<li>Service hosted on Raspberry Pi’s must be available on the internet</li>
 </ul>
 </section>
 
@@ -71,8 +84,8 @@
 </section>
 
 <section>
-<section id="deliverables" class="title-slide slide level1">
-<h1>Deliverables</h1>
+<section id="requirement-breakdown" class="title-slide slide level1">
+<h1>Requirement Breakdown</h1>
 
 </section>
 <section id="kubernetes-setup" class="slide level2">
@@ -91,6 +104,7 @@
 <li>Research what settings are needed (2-3 days)</li>
 <li>Work with Deployment UI Website team to define template format (4-6 days)</li>
 <li>Create end-user documentation for config template (1 days)</li>
+<li>Code reviews and release (4-5 Days)</li>
 </ol>
 </section>
 <section id="github-container-pipeline" class="slide level2">
@@ -101,7 +115,7 @@
 <li>Coordinate with K8S Deployment team to define container handoff API (2-3 days)</li>
 <li>Modify build script to send built image to K8S onboarding (1-2 days)</li>
 <li>Modify script to ensure clean building environment (1-2 days)</li>
-<li>Code Reviews and release (4-5 Days) <!-- (f) Modify script to use user-selected generic Dockerfile if none provided (3-4 days) [stretch] --> <!-- (g) Integrate build pipeline with Github Actions (5-7days) [stretch] --></li>
+<li>Code Reviews and release (4-5 Days)</li>
 </ol>
 </section>
 <section id="kubernetes-deployment-pipeline" class="slide level2">
@@ -116,6 +130,15 @@
 </section>
 <section id="user-facing-deployment-ui-website" class="slide level2">
 <h2>5. User-facing Deployment UI Website</h2>
+<ol type="a">
+<li>Create a clean and usable web UI (3-6 days)</li>
+<li>Containerize the web UI and self-host on the cluster (1 day)</li>
+<li>Create an interface to pass applications as well as necessary configuration settings to the pipeline for deployment (3-6 days)</li>
+<li>Expose admin tools, such as Lens IDE (2-7 days)</li>
+<li>Set up authentication (3-5 days)</li>
+<li>Code reviews and release (4-5 days)</li>
+<li>Set up an automated system for containerizing an application to be passed to the pipeline that is not yet containerized (2-4 days) [stretch]</li>
+</ol>
 </section>
 <section id="final-integration" class="slide level2">
 <h2>6. Final Integration</h2>
@@ -123,25 +146,169 @@
 <section id="beta-testing" class="slide level2">
 <h2>7. Beta Testing</h2>
 </section></section>
-<section id="tasks" class="title-slide slide level1">
-<h1>Tasks</h1>
-
+<section id="tasks-distribution" class="title-slide slide level1">
+<h1>Tasks distribution</h1>
+<p>Phase 1: Mark - TM1 Phase 2: Jacob - TM2 Phase 3: Robert - TM3 Phase 4: Paul - TM4 Phase 5: Nathan - TM5</p>
 </section>
 
+<section>
 <section id="component-interfaces" class="title-slide slide level1">
 <h1>Component Interfaces</h1>
 
 </section>
-
-<section id="management-method" class="title-slide slide level1">
-<h1>Management Method</h1>
+<section id="kubernetes" class="slide level2">
+<h2>1. Kubernetes</h2>
+</section>
+<section id="config-template" class="slide level2">
+<h2>2. Config Template</h2>
+<ul>
+<li>coordinate with Phase 5</li>
+<li>site will take this data from user and generate template</li>
+<li>specifics will be added when needed</li>
+</ul>
+</section>
+<section id="github-build" class="slide level2">
+<h2>3. Github Build</h2>
+<ul>
+<li>coordinate with Phase 4</li>
+<li>Docker builds image and stores internally</li>
+<li>needs to be passed to K8S somehow</li>
+</ul>
+</section>
+<section id="k8s-onboarding" class="slide level2">
+<h2>4. K8S Onboarding</h2>
+</section>
+<section id="management-site" class="slide level2">
+<h2>5. Management Site</h2>
+<ul>
+<li>coordinate with Phase 2</li>
+<li>needs to expose required settings for user input</li>
+<li>generate config for Phase 3</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>coordinate with Phase 1</li>
+<li>how to expose Lens UI to developers</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="schedule" class="title-slide slide level1">
+<h1>Schedule</h1>
 
 </section>
+<section id="fall-term" class="slide level2">
+<h2>Fall term:</h2>
+<ul>
+<li>Sprint 2: phase 1</li>
+<li>Sprint 3: phase 2 (1/2)</li>
+</ul>
+</section>
+<section id="winter-term" class="slide level2">
+<h2>Winter term:</h2>
+<ul>
+<li>Sprint 4: phase 2 (2/2), phase 3 (1/2), phase 4, phase 5 (1/2)</li>
+<li>Sprint 5: phase 3 (2/2), phase 5 (2/2)</li>
+<li>Sprint 6: Integration</li>
+</ul>
+</section>
+<section id="spring-term" class="slide level2">
+<h2>Spring term:</h2>
+<ul>
+<li>Sprint 7: Beta testing</li>
+</ul>
+</section></section>
+<section id="management" class="title-slide slide level1">
+<h1>Management</h1>
+<figure>
+<img data-src="images/trello.png" alt="Trello board" /><figcaption aria-hidden="true">Trello board</figcaption>
+</figure>
+</section>
 
-<section id="sprint-deliverables" class="title-slide slide level1">
-<h1>Sprint Deliverables</h1>
+<section>
+<section id="sprint-goals" class="title-slide slide level1">
+<h1>Sprint Goals</h1>
 
 </section>
+<section id="sprint-2-111-to-1121" class="slide level2">
+<h2>Sprint 2 (11/1 to 11/21)</h2>
+<p><strong>Planned Deliverables:</strong></p>
+<ul>
+<li>Installation &amp; configuration of cluster
+<ul>
+<li>Kubernetes</li>
+<li>K8S Lens</li>
+</ul></li>
+</ul>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li>None</li>
+</ul>
+</section>
+<section id="sprint-3-1122-to-1212" class="slide level2">
+<h2>Sprint 3 (11/22 to 12/12)</h2>
+<p><strong>Planned Deliverables:</strong></p>
+<ul>
+<li>Configuration files for K8S can be generated from user options</li>
+<li>Lens is installed and running on the cluster</li>
+</ul>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li>K8S is installed and working on the devices</li>
+</ul>
+</section>
+<section id="sprint-4-13-to-123" class="slide level2">
+<h2>Sprint 4 (1/3 to 1/23)</h2>
+<p><strong>Planned Deliverables:</strong></p>
+<ul>
+<li>Pipeline functional</li>
+<li>Builds image from GitHub repo</li>
+<li>Image then detected and launched by K8S</li>
+<li>UI hosted and accessible on cluster</li>
+<li>Site can pass app config to and trigger build pipeline</li>
+</ul>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li>K8S is installed and working on the devices</li>
+<li>K8S config files can be generated from user options</li>
+</ul>
+</section>
+<section id="sprint-5-124-to-213" class="slide level2">
+<h2>Sprint 5 (1/24 to 2/13)</h2>
+<p><strong>Planned Deliverables:</strong></p>
+<ul>
+<li>Authentication required for pipeline UI to prevent unauthorized attempts to access the cluster</li>
+<li>Admin tools from Lens exposed by UI</li>
+</ul>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li>K8S is installed and working on the devices</li>
+<li>Lens running on cluster</li>
+<li>UI running on cluster</li>
+</ul>
+</section>
+<section id="sprint-6-214-to-36" class="slide level2">
+<h2>Sprint 6 (2/14 to 3/6)</h2>
+<p><strong>Planned Deliverables:</strong></p>
+<ul>
+<li>Integration testing completed</li>
+</ul>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li>All previous deliverables</li>
+</ul>
+</section>
+<section id="sprint-7-328-to-417" class="slide level2">
+<h2>Sprint 7 (3/28 to 4/17)</h2>
+<p><strong>Planned Deliverables:</strong></p>
+<ul>
+<li>Beta testing complete</li>
+</ul>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li>Integration finished</li>
+</ul>
+</section></section>
     </div>
   </div>
 
