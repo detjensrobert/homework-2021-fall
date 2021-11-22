@@ -207,7 +207,11 @@ Phase 5: TM5
 
 ![Trello board](images/trello.png)
 
+$\pagebreak$
+
 # Sprint Goals
+
+![Gantt Chart](images/gantt.png)
 
 ## Sprint 2 (11/1 to 11/21)
 
@@ -279,3 +283,7 @@ Phase 5: TM5
 **Dependencies:**
 
 - Integration finished
+
+---
+
+# fin
