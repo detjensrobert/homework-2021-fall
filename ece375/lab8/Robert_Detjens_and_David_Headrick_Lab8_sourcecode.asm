@@ -120,7 +120,7 @@ PROMPT:
   ; call    LCDWriteCmd
 
   ; start with A
-  ldi     curr_letter,  65
+  ldi     curr_letter,  'A'
 
   PROMPT_LOOP:
     ; store current letter to LCD memory
@@ -249,15 +249,21 @@ PRINT_MORSE:
   add   curr_letter,  mpr
 
   ; use as index into JUMP_TABLE
-  ldi   mpr,  JUMP_TABLE
+  ldi   mpr,  LOW(JUMP_TABLE)
   add   mpr,  curr_letter
 
   ; store to Z for indirect call
   ldi   ZL,   LOW(JMP_target)
   ldi   ZH,   HIGH(JMP_target)
-  st    Z,    mpr
+  st    Z+,    mpr ; low byte of address
+
+  ; dont forget to store high byte too
+  ldi   mpr,  HIGH(JUMP_TABLE)
+  st    Z,    mpr ; high byte of address
 
   ; now do the indirect call to print the letter from the table
+  ldi   ZL,   LOW(JMP_target)
+  ldi   ZH,   HIGH(JMP_target)
   icall
 
   ; wait 2 more units (for 3 total) between letters
