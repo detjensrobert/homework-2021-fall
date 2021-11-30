@@ -88,9 +88,9 @@ MAIN:
 ; PROMPT()
 ;   Main function for getting the word input from the user.
 ;   Polls buttons:
-;     call    DASH 6/7 step through letters
-;     call    DASH 0 confirms the letter
-;     call    DASH 4 confirms the word and returns (for transmission)
+;     rcall   DASH 6/7 step through letters
+;     rcall   DASH 0 confirms the letter
+;     rcall   DASH 4 confirms the word and returns (for transmission)
 PROMPT:
   ; load prompt string into line 1
   ; location of string in program memory
@@ -336,140 +336,136 @@ WAIT_3:
   ret
 
 JUMP_TABLE:
-  call    DOT
-  call    DASH
+  rcall   DOT
+  rcall   DASH
   ret
   nop
   nop
-  call    DASH
-  call    DOT
-  call    DOT
-  call    DOT
+  rcall   DASH
+  rcall   DOT
+  rcall   DOT
+  rcall   DOT
   ret
-  call    DASH
-  call    DOT
-  call    DASH
-  call    DOT
+  rcall   DASH
+  rcall   DOT
+  rcall   DASH
+  rcall   DOT
   ret
-  call    DASH
-  call    DOT
-  call    DOT
-  ret
-  nop
-  call    DOT
+  rcall   DASH
+  rcall   DOT
+  rcall   DOT
   ret
   nop
-  nop
-  nop
-  call    DOT
-  call    DOT
-  call    DASH
-  call    DOT
-  ret
-  call    DASH
-  call    DASH
-  call    DOT
-  ret
-  nop
-  call    DOT
-  call    DOT
-  call    DOT
-  call    DOT
-  ret
-  call    DOT
-  call    DOT
-  ret
-  nop
-  nop
-  call    DOT
-  call    DASH
-  call    DASH
-  call    DASH
-  ret
-  call    DASH
-  call    DOT
-  call    DASH
-  ret
-  nop
-  call    DOT
-  call    DASH
-  call    DOT
-  call    DOT
-  ret
-  call    DASH
-  call    DASH
-  ret
-  nop
-  nop
-  call    DASH
-  call    DOT
-  ret
-  nop
-  nop
-  call    DASH
-  call    DASH
-  call    DASH
-  ret
-  nop
-  call    DOT
-  call    DASH
-  call    DASH
-  call    DOT
-  ret
-  call    DASH
-  call    DASH
-  call    DOT
-  call    DASH
-  ret
-  call    DOT
-  call    DASH
-  call    DOT
-  ret
-  nop
-  call    DOT
-  call    DOT
-  call    DOT
-  ret
-  nop
-  call    DASH
+  rcall   DOT
   ret
   nop
   nop
   nop
-  call    DOT
-  call    DOT
-  call    DASH
+  rcall   DOT
+  rcall   DOT
+  rcall   DASH
+  rcall   DOT
+  ret
+  rcall   DASH
+  rcall   DASH
+  rcall   DOT
   ret
   nop
-  call    DOT
-  call    DOT
-  call    DOT
-  call    DASH
+  rcall   DOT
+  rcall   DOT
+  rcall   DOT
+  rcall   DOT
   ret
-  call    DOT
-  call    DASH
-  call    DASH
+  rcall   DOT
+  rcall   DOT
   ret
   nop
-  call    DASH
-  call    DOT
-  call    DOT
-  call    DASH
+  nop
+  rcall   DOT
+  rcall   DASH
+  rcall   DASH
+  rcall   DASH
   ret
-  call    DASH
-  call    DOT
-  call    DASH
-  call    DASH
+  rcall   DASH
+  rcall   DOT
+  rcall   DASH
   ret
-  call    DASH
-  call    DASH
-  call    DOT
-  call    DOT
+  nop
+  rcall   DOT
+  rcall   DASH
+  rcall   DOT
+  rcall   DOT
   ret
-
-
-
-
+  rcall   DASH
+  rcall   DASH
+  ret
+  nop
+  nop
+  rcall   DASH
+  rcall   DOT
+  ret
+  nop
+  nop
+  rcall   DASH
+  rcall   DASH
+  rcall   DASH
+  ret
+  nop
+  rcall   DOT
+  rcall   DASH
+  rcall   DASH
+  rcall   DOT
+  ret
+  rcall   DASH
+  rcall   DASH
+  rcall   DOT
+  rcall   DASH
+  ret
+  rcall   DOT
+  rcall   DASH
+  rcall   DOT
+  ret
+  nop
+  rcall   DOT
+  rcall   DOT
+  rcall   DOT
+  ret
+  nop
+  rcall   DASH
+  ret
+  nop
+  nop
+  nop
+  rcall   DOT
+  rcall   DOT
+  rcall   DASH
+  ret
+  nop
+  rcall   DOT
+  rcall   DOT
+  rcall   DOT
+  rcall   DASH
+  ret
+  rcall   DOT
+  rcall   DASH
+  rcall   DASH
+  ret
+  nop
+  rcall   DASH
+  rcall   DOT
+  rcall   DOT
+  rcall   DASH
+  ret
+  rcall   DASH
+  rcall   DOT
+  rcall   DASH
+  rcall   DASH
+  ret
+  rcall   DASH
+  rcall   DASH
+  rcall   DOT
+  rcall   DOT
+  ret
 
 ;***********************************************************
 ;*  Additional Program Includes
