@@ -63,6 +63,7 @@ INIT:
   ; ldi   mpr,      0
   ; out   TCCR1A,   mpr
   ldi   mpr,      0b00000101  ; clk/1024 prescaling
+  ldi   mpr,      0b00000100  ; TODO: remove
   out   TCCR1B,   mpr
   ; ldi   mpr,      0
   ; out   TCCR1C,   mpr
@@ -304,14 +305,11 @@ PRINT_MORSE:
   lsl   curr_letter
   add   curr_letter,  mpr
 
-  ; use as index into JUMP_TABLE
-  ldi   mpr,  LOW(JUMP_TABLE)
-  add   mpr,  curr_letter
-
   ; put new address in Z for indirect call
-  mov   ZL,   mpr
-  ; dont forget to store high byte too
-  ldi   ZH,  HIGH(JUMP_TABLE)
+  ldi   ZH,   HIGH(JUMP_TABLE)
+  ldi   ZL,   LOW(JUMP_TABLE)
+  ; use as index into JUMP_TABLE
+  add   ZL,   curr_letter
 
   ; now do the indirect call to print the letter from the table
   icall
@@ -357,6 +355,7 @@ DASH:
   ret
 
 WAIT_1:
+
   ; 0xFFFF - 16000 (0x3E80) = 0xC17F
   ldi   mpr,      0xC1
   out   TCNT1H,   mpr
@@ -386,6 +385,7 @@ WAIT_3:
   ret
 
 JUMP_TABLE:
+  nop
   rcall   DOT
   rcall   DASH
   ret
