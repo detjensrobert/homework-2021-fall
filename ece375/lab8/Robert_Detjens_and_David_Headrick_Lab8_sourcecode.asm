@@ -63,7 +63,7 @@ INIT:
   ; ldi   mpr,      0
   ; out   TCCR1A,   mpr
   ldi   mpr,      0b00000101  ; clk/1024 prescaling
-  ldi   mpr,      0b00000100  ; TODO: remove
+  ; ldi   mpr,      0b00000100  ; TODO: remove, clk/256
   out   TCCR1B,   mpr
   ; ldi   mpr,      0
   ; out   TCCR1C,   mpr
@@ -276,7 +276,11 @@ MORSE:
   ldi     YL,   low(LCD_Line2)
   ldi     YH,   high(LCD_Line2)
 
-  ld      curr_letter,  Y+
+  ; for some reason the first dot/dash is ignored
+  ; so "display" a letter with only one dot
+  ; and now the actual message just works
+  ; Programming :tm:
+  ldi     curr_letter,  'E'
   morse_loop:
     ; print current char
     rcall PRINT_MORSE
