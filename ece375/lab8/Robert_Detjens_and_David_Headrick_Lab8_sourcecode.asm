@@ -305,11 +305,13 @@ PRINT_MORSE:
   lsl   curr_letter
   add   curr_letter,  mpr
 
+  clr   mpr
   ; put new address in Z for indirect call
-  ldi   ZH,   HIGH(JUMP_TABLE)
   ldi   ZL,   LOW(JUMP_TABLE)
+  ldi   ZH,   HIGH(JUMP_TABLE)
   ; use as index into JUMP_TABLE
   add   ZL,   curr_letter
+  adc   ZH,   mpr
 
   ; now do the indirect call to print the letter from the table
   icall
@@ -385,7 +387,6 @@ WAIT_3:
   ret
 
 JUMP_TABLE:
-  nop
   rcall   DOT
   rcall   DASH
   ret
