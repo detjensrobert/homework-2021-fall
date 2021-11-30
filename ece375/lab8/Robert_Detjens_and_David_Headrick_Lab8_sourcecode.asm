@@ -70,6 +70,9 @@ INIT:
   ; Enable global interrupts (if any are used)
   ; sei
 
+  ; Display intro message & wait for button
+  rcall   INTRO
+
 ;***********************************************************
 ;*  Main Program
 ;***********************************************************
@@ -80,10 +83,57 @@ MAIN:
   rjmp    MAIN    ; return to top of MAIN
 
 
-
 ;***********************************************************
 ;*  Functions
 ;***********************************************************
+
+
+; INTRO()
+;   Displays a welcome message on the LCD
+;   and waits for the user to press button 0.
+INTRO:
+  ; load intro strings to lcd memory
+
+  ; Move strings from Program Memory to Data Memory
+  ; location of string in program memory
+  ldi     ZL,   low(WELCOME_L1_S << 1)
+  ldi     ZH,   high(WELCOME_L1_S << 1)
+  ; dest addr in data memory (0x0100)
+  ldi     YL,   low(LCD_Line1)
+  ldi     YH,   high(LCD_Line1)
+  istr1_l:
+    lpm     mpr,  Z+
+    st      Y+,   mpr
+    cpi     YL, low(WELCOME_L1_E << 1)
+    brne    istr1_l
+
+  ; String 2
+  ldi     ZL,   low(WELCOME_L2_S << 1)
+  ldi     ZH,   high(WELCOME_L2_S << 1)
+  ; dest addr in data memory (0x0100)
+  ldi     YL,   low(LCD_Line2)
+  ldi     YH,   high(LCD_Line2)
+  istr2_l:
+    lpm     mpr,  Z+
+    st      Y+,   mpr
+    cpi     YL, low(WELCOME_L2_E << 1)
+    brne    istr2_l
+
+  ; display the strings
+  call LCDWrite
+
+  ; now wait for pd0 button
+  wait_for_b0:
+
+    ; get button inputs
+    in    mpr,    PIND
+    sbrc  mpr,    0
+    jmp   wait_for_b0
+
+  rcall DEBOUNCE
+
+  ret
+
 
 ; PROMPT()
 ;   Main function for getting the word input from the user.
@@ -190,19 +240,25 @@ PROMPT:
       ret
 
     BIT_DONE:
-    ; wait a bit for debounce
-    ; reuse exising wait func for inner loop
-    ldi   mpr,    100
-    debounce:
-      ldi   wait,   255
-      call  LCDWait
-      dec   mpr
-    brne  debounce
-
+    rcall DEBOUNCE
     BIT_NONE:
 
   ; keep looping until button 4 is hit
   jmp   PROMPT_LOOP
+
+DEBOUNCE:
+  ; wait for a small delay to do some real basic debouncing
+
+  ; wait a bit for debounce
+  ; reuse exising wait func for inner loop
+  ldi   mpr,    100
+  debounce_l:
+    ldi   wait,   255
+    call  LCDWait
+    dec   mpr
+  brne  debounce_l
+
+  ret
 
 ; MORSE()
 ;   Broadcasts the characters in data memory $1010:1020
@@ -252,18 +308,12 @@ PRINT_MORSE:
   ldi   mpr,  LOW(JUMP_TABLE)
   add   mpr,  curr_letter
 
-  ; store to Z for indirect call
-  ldi   ZL,   LOW(JMP_target)
-  ldi   ZH,   HIGH(JMP_target)
-  st    Z+,    mpr ; low byte of address
-
+  ; put new address in Z for indirect call
+  mov   ZL,   mpr
   ; dont forget to store high byte too
-  ldi   mpr,  HIGH(JUMP_TABLE)
-  st    Z,    mpr ; high byte of address
+  ldi   ZH,  HIGH(JUMP_TABLE)
 
   ; now do the indirect call to print the letter from the table
-  ldi   ZL,   LOW(JMP_target)
-  ldi   ZH,   HIGH(JMP_target)
   icall
 
   ; wait 2 more units (for 3 total) between letters
@@ -476,8 +526,14 @@ JUMP_TABLE:
 ;*  Stored Program Data
 ;***********************************************************
 
+WELCOME_L1_S:
+.DB   "Welcome!        "
+WELCOME_L1_E:
+WELCOME_L2_S:
+.DB   "Please press PD0"
+WELCOME_L2_E:
 PROMPT_S:
-.DB    "Enter word:     "
+.DB   "Enter word:     "
 PROMPT_E:
 
 ;***********************************************************
@@ -491,4 +547,3 @@ LCD_Line1:	.byte $10
 LCD_Line2:	.byte $10
 .org	$0120
 LCD_End:
-JMP_target: .byte 2
