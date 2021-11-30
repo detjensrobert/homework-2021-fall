@@ -1,6 +1,7 @@
 ---
+header-includes:
+  - \usepackage{verbatim}
 fontsize: 12pt
-monofontsize: 10pt
 ---
 
 \begin{titlepage}
@@ -37,3 +38,5 @@ monofontsize: 10pt
 # Conclusion
 
 # Source Code
+
+\verbatiminput{Robert_Detjens_and_David_Headrick_Lab8_sourcecode.asm}

@@ -1,12 +1,12 @@
 ;***********************************************************
 ;*
-;*  Robert Detjens & David Headrick Lab 7 Source Code
+;*  Robert Detjens & David Headrick Lab 8 Source Code
 ;*
 ;***********************************************************
 ;*
 ;*   Author: Robert Detjens
 ;*           David Headrick
-;*     Date: 11/16/21
+;*     Date: 11/30/21
 ;*
 ;***********************************************************
 
@@ -16,6 +16,7 @@
 
 .def    mpr           = r16
 .def    curr_letter   = r23
+.def    zeroreg          = r24
 
 ;***********************************************************
 ;*  Start of Code Segment
@@ -70,6 +71,9 @@ INIT:
 
   ; Enable global interrupts (if any are used)
   ; sei
+
+  ; clear zero register
+  clr     zeroreg
 
   ; Display intro message & wait for button
   rcall   INTRO
@@ -265,21 +269,19 @@ DEBOUNCE:
 ;   Broadcasts the characters in data memory $1010:1020
 ;   as Morse code over the top 3 LEDS on port B
 MORSE:
-
   ; turn on PIN/LED 4 to signal broadcasting
   ldi   mpr,    0b00010000
   out   PORTB,  mpr
-
 
   ; go through chars in line 2
   ; second line in data memory (0x0110)
   ldi     YL,   low(LCD_Line2)
   ldi     YH,   high(LCD_Line2)
 
-  ; for some reason the first dot/dash is ignored
-  ; so "display" a letter with only one dot
-  ; and now the actual message just works
-  ; Programming :tm:
+  ; for some reason the first dot/dash is ignored,
+  ; so "display" a letter with only one dot (e.g. E)
+  ; and now subsequent letters (the actual message) works
+  ; I Love Programming:tm:
   ldi     curr_letter,  'E'
   morse_loop:
     ; print current char
@@ -298,26 +300,27 @@ MORSE:
 
   ret
 
-
-; print ascii char in curr_letter as morse
+; PRINT_MORSE():
+;   Prints the ascii char in curr_letter as morse code. This uses an jump into
+;   JUMP_TABLE to efficiently perform the correct sequence of dots/dashes based
+;   on an index calculated from the current letter.
 PRINT_MORSE:
 
-  ; (curr_letter - 'A') * 5
+  ; curr_letter = (curr_letter - 'A') * 5
   subi  curr_letter,  'A'
   mov   mpr,  curr_letter
   lsl   curr_letter
   lsl   curr_letter
   add   curr_letter,  mpr
 
-  clr   mpr
-  ; put new address in Z for indirect call
+  ; load address of jump table into Z for indirect call
   ldi   ZL,   LOW(JUMP_TABLE)
   ldi   ZH,   HIGH(JUMP_TABLE)
-  ; use as index into JUMP_TABLE
+  ; add calculated letter offset
   add   ZL,   curr_letter
-  adc   ZH,   mpr
+  adc   ZH,   zeroreg
 
-  ; now do the indirect call to print the letter from the table
+  ; indirect call to JUMP_TABLE+offset
   icall
 
   ; wait 2 more units (for 3 total) between letters
@@ -372,7 +375,7 @@ WAIT_1:
   rjmp  wait_for_timer
 
 WAIT_3:
-  ; 0xFFFF - 16000 (0x3E80) = 0xC17F
+  ; 0xFFFF - 48000 (0xBB800) = 0x447F
   ldi   mpr,      0x44
   out   TCNT1H,   mpr
   ldi   mpr,      0x7f
