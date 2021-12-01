@@ -94,11 +94,13 @@ eventually remembered to remove it, and it worked after.
 
 The simulator proved to be annoying during this lab. Anything that used a timer, e.g. the Morse code delays, took a very
 long time to simulate. We had to comment out a few lines and make other modifications to make debugging in the simulator
-easier. That being said, the examination tools in the simulator proved to be pivotal when debugging the mentioned issues with the jump table.
+easier. That being said, the examination tools in the simulator proved to be pivotal when debugging the mentioned issues
+with the jump table.
 
 # Conclusion
 
-The hardest part of Lab 8 was the jump table. The jump table took the longest amount of time to debug because of the odd errors.
+The hardest part of Lab 8 was the jump table. The jump table took the longest amount of time to debug because of the odd
+errors.
 
 As far as the button presses go, our past labs helped us out a lot. We were able to reuse polling code from previous
 labs. Not once in this lab did we have a problem with the buttons, just took some fine tuning for the debounce length.
