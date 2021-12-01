@@ -16,7 +16,7 @@
 
 .def    mpr           = r16
 .def    curr_letter   = r23
-.def    zeroreg          = r24
+.def    zeroreg       = r24
 
 ;***********************************************************
 ;*  Start of Code Segment
