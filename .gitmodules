@@ -3,4 +3,4 @@
 	url = git@gitlab.unexploitable.systems:detjensrobert/jos.git
 [submodule "cs461/group-project"]
 	path = cs461/group-project
-	url = git@github.com:detjensrobert/capstone-group-project.git
+	url = git@github.com:capstone-kubernetes-aas/class-documents.git
